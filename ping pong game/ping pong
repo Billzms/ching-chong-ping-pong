@@ -1,0 +1,80 @@
+
+from random import *
+from pygame import *
+font.init()
+mixer.init()
+font.init()
+win = display.set_mode((700,500))
+display.set_caption('RACKET GAME')
+bg = transform.scale(image.load("th.jpg"),(700,500))
+run = True
+clock = time.Clock()
+win_width = 700
+win_height = 500
+run = True
+FPS=50
+finish = False
+
+
+class Gamesprite(sprite.Sprite):
+    def __init__(self,player_name,height,width,player_x,player_y,speed):
+        self.image = transform.scale(image.load(player_name),(width , height))
+        self.rect = self.image.get_rect()
+        self.rect.x = player_x
+        self.rect.y = player_y
+        self.speed = speed
+
+    def show(self):
+        win.blit(self.image,(self.rect.x,self.rect.y))
+
+class rackets(Gamesprite):
+    
+    def update_r(self):
+        key_p = key.get_pressed()
+        if key_p[K_DOWN] and self.rect.y <= win_height-(150 +  15):
+            self.rect.y = self.rect.y + self.speed 
+        if key_p[K_UP] and self.rect.y >= 10:
+            self.rect.y = self.rect.y - self.speed 
+    def update_l(self):
+        key_p = key.get_pressed()
+        if key_p[K_s] and self.rect.y <= win_height-(150 +  15):
+            self.rect.y = self.rect.y + self.speed 
+        if key_p[K_w] and self.rect.y >= 10:
+            self.rect.y = self.rect.y - self.speed 
+
+
+racket_l= rackets('pingpo.png',150,50,30,200,4)
+racket_r=rackets('pingpo.png',150,50,612,200,4)
+ball = Gamesprite('ping_pong_ball.png',50,50,200,200,4)
+speed_x = ball.speed
+speed_y = ball.speed
+
+f = font.Font(None,40)
+losetext_1 = f.render('PLAYER 1 LOSES',True,(255,0,0))
+losetext_2 = f.render('PLAYER 2 LOSES',True,(255,0,0))
+
+while run :
+    for e in event.get():
+        if e.type == QUIT:
+            run = False
+    if finish != True:
+        win.blit(bg,(0,0))
+        racket_l.update_l()
+        racket_r.update_r()
+        ball.show()
+        racket_l.show()
+        racket_r.show()
+        ball.rect.x += speed_x
+        ball.rect.y += speed_y
+        if sprite.collide_rect(racket_l,ball) or sprite.collide_rect(racket_r,ball):
+            speed_x *= -1
+        if ball.rect.y <= 0 or ball.rect.y >= win_height - 50:
+            speed_y *=-1
+        if ball.rect.x <=0:
+            win.blit(losetext_1,(300,200))
+            finish = True
+        if ball.rect.x >= 650:
+            win.blit(losetext_2,(300,200))
+            finish =True
+    clock.tick(FPS)
+    display.update()
